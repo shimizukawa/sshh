@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_passphrase(keyfile, phrase) -> bool:
-    """return True if the keyfile/phrase pair is matched.
+    """confirm passphrase for the keyfile.
 
     :param keyfile: ssh key file path
     :param phrase: passphrase for keyfile
@@ -47,7 +47,7 @@ def test_passphrase(keyfile, phrase) -> bool:
 def cmd_add(request):
     passphrase = getpass(prompt='Enter passphrase for the keyfile: ')
     fpath = Path(request.keyfile.name).absolute()
-    if test_passphrase(fpath, passphrase):   # 鍵のパスフレーズを検査
+    if test_passphrase(fpath, passphrase):
         request.registry.add_passphrase(request.group, fpath, passphrase)
         request.registry.save()
         logger.info('The keyfile is registered.')
@@ -68,7 +68,7 @@ def cmd_agent(request):
     agent_setting = ret.stdout
     logger.debug('start agent: %s', agent_setting)
     sshenv = os.environ.copy()
-    # 起動したssh-agentのSSH_AGENT_PIDを環境変数に登録する
+    # apply SSH_AGENT_PID environment variable from invoked ssh-agent
     sshenv.update({
         k: v.rstrip(';')
         for k, v in [part.split('=') for part in agent_setting.split() if '=' in part]
@@ -106,13 +106,13 @@ def cmd_agent(request):
     except RuntimeError as e:
         logger.error(e)
     else:
-        # shellを起動する
+        # invoke new shell for invoked ssh-agent
         sshenv['PS1'] = f"[{request.group}]{sshenv['PS1']}"
         logger.info('ssh-agent PID=%s session "%s" has been started. To close this session, exit shell.',
                     sshenv['SSH_AGENT_PID'], request.group)
         subprocess.run (sshenv['SHELL'], env=sshenv)
     finally:
-        # agentを終了
+        # kill agent
         subprocess.run(['ssh-agent', '-k'], env=sshenv, stdout=subprocess.DEVNULL)
         logger.info('ssh-agent PID=%s session "%s" was closed.',
                     sshenv['SSH_AGENT_PID'], request.group)
@@ -176,7 +176,7 @@ def setup_logger(is_debug=False):
 
 def main():
     if os.environ.get('PASSPHRASE'):
-        # ssh-addから呼ばれる、ssh-askpassとしての動作
+        # behave as ssh-askpass when ssh-add require passphrase
         print(os.environ['PASSPHRASE'])
         sys.exit(0)
 
