@@ -104,8 +104,8 @@ jinja2 = "*"
 toml = "*"
 
 [metadata]
-content-hash = "611dc6e2d0452847ca4a4b3c564165441a80c4e515779c80014b903b5964f2d3"
-python-versions = "^3.6"
+content-hash = "5d3c7752597098ac7c89e8d822f125fd9fcc7d20e8977def4fd2885f024160e2"
+python-versions = ">=3.6"
 
 [metadata.hashes]
 asn1crypto = ["2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87", "9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49"]
