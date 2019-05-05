@@ -11,7 +11,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from ssh_util.config import REGISTRY_FILE
+from sshh.config import REGISTRY_FILE
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ class Registry:
 
     def load(self, password=None):
         if not self.path.exists():
-            logger.error("Registry file doesn't exist. Please do 'ssh_util init'")
+            logger.error("Registry file doesn't exist. Please do 'sshh init'")
             return
 
         if self._store is not None:

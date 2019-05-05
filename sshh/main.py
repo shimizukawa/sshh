@@ -8,7 +8,7 @@ import argparse
 from getpass import getpass
 from pathlib import Path
 
-from ssh_util.regstry import Registry
+from sshh.regstry import Registry
 
 logger = logging.getLogger(__name__)
 
