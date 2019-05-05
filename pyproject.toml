@@ -6,13 +6,28 @@ authors = ["Takayuki Shimizukawa <shimizukawa@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.rst"
 include = ["CHANGELOG.rst"]
+homepage = "https://github.com/shimizukawa/ssh_util"
+repository = "https://github.com/shimizukawa/ssh_util"
+documentation = "https://github.com/shimizukawa/ssh_util/blob/master/README.rst"
+keywords = ["ssh", "utility"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: MacOS X",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: BSD",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Unix",
+    "Topic :: Utilities",
+]
 
 [tool.poetry.dependencies]
-python = "^3.6"
-cryptography = "^2.6"
+python = ">=3.6"
+cryptography = ">=2.6"
 
 [tool.poetry.dev-dependencies]
-towncrier = "^19.2"
+towncrier = ">=19.2"
 
 [build-system]
 requires = ["poetry>=0.12", "setuptools>=30.3.0", "wheel", "setuptools_scm"]
