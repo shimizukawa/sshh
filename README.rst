@@ -7,12 +7,31 @@ ssh command utility
 TODO for 0.9.0
 ==============
 
-* add feature change password
 * change command name
 
 
 Usages
 =======
+
+First use
+----------
+
+::
+
+    (.venv) $ ssh_util init
+    Enter password for your registry: xxxxx
+    The registry file ~/.ssh.secret is created.
+
+Change password
+----------------
+
+::
+
+    (.venv) $ ssh_util chpw
+    Enter CURRENT password for your registry: xxxxx
+    Enter NEW password for your registry: yyyyy
+    Enter NEW password again for verification: yyyyy
+    Password has been changed.
 
 Register key
 -------------

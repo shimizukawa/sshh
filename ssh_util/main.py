@@ -118,11 +118,36 @@ def cmd_agent(request):
                     sshenv['SSH_AGENT_PID'], request.group)
 
 
+def cmd_init(request):
+    request.registry.init()
+
+
+def cmd_chpw(request):
+    reg = request.registry
+    password = getpass(prompt='Enter CURRENT password for your registry: ')
+    reg.load(password)
+    password1 = getpass(prompt='Enter NEW password for your registry: ')
+    password2 = getpass(prompt='Enter NEW password again for verification: ')
+    if password1 == password2:
+        reg.save(password1)
+        logging.info('Password has been changed.')
+    else:
+        logging.error("NEW passwords didn't match")
+
+
 def get_argparser():
     p = argparse.ArgumentParser()
     p.set_defaults(func=lambda a: p.print_help())
     p.add_argument('-d', '--debug', action='store_true', default=False, help='debug mode')
     subs = p.add_subparsers(title='sub commands')
+
+    # init
+    p_init = subs.add_parser('init')
+    p_init.set_defaults(func=cmd_init)
+
+    # change password
+    p_chpw = subs.add_parser('chpw')
+    p_chpw.set_defaults(func=cmd_chpw)
 
     # add key
     p_add = subs.add_parser('add')
@@ -138,9 +163,6 @@ def get_argparser():
     p_agent = subs.add_parser('agent')
     p_agent.add_argument('-g', '--group', type=str, default='default', help='group name')
     p_agent.set_defaults(func=cmd_agent)
-
-    # change password
-    # TODO provide change password feature
 
     return p
 

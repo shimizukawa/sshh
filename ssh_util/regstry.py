@@ -52,6 +52,15 @@ class Registry:
             self.load()
         return self._store
 
+    def init(self):
+        if self.path.exists():
+            logger.error('Registry file is already exist: %s', self.path)
+            return
+
+        self._store = {}
+        self.save()
+        logger.info('Registry file has been initialized: %s', self.path)
+
     def load(self, password=None):
         if not self.path.exists():
             logger.error("Registry file doesn't exist. Please do 'ssh_util init'")
