@@ -4,8 +4,19 @@ ssh_util
 
 ssh command utility
 
+TODO
+====
+
+* add feature change password
+* use semver
+* change command name
+
+
+Usages
+=======
+
 Register key
-=============
+-------------
 
 ::
 
@@ -15,7 +26,7 @@ Register key
     The keyfile is registered.
 
 List keys
-==========
+----------
 
 ::
 
@@ -30,7 +41,7 @@ List keys
     /home/user/.ssh/id_rsa_server8
 
 Invoke ssh-agent
-=================
+-----------------
 
 ::
 
