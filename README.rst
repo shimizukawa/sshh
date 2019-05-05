@@ -4,11 +4,10 @@ ssh_util
 
 ssh command utility
 
-TODO
-====
+TODO for 0.9.0
+==============
 
 * add feature change password
-* use semver
 * change command name
 
 
