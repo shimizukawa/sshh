@@ -7,14 +7,14 @@ ssh command utility
 Usages
 =======
 
-First use
-----------
+Init
+-----
 
 ::
 
     (.venv) $ sshh init
     Enter password for your registry: xxxxx
-    The registry file ~/.ssh.secret is created.
+    The registry file ~/.sshh.registry is created.
 
 Change password
 ----------------

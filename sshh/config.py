@@ -1,1 +1,1 @@
-REGISTRY_FILE = '~/.ssh.secret'
+REGISTRY_FILE = '~/.sshh.registry'
