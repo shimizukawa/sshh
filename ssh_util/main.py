@@ -161,13 +161,12 @@ def main():
     p = get_argparser()
     args = p.parse_args(sys.argv[1:])
     setup_logger(args.debug)
-    password = getpass(prompt='Enter password for your registry: ')
+    args.registry = Registry()
     try:
-        args.registry = Registry(password=password)
+        args.func(args)
     except Registry.InvalidToken:
         logger.error('Wrong password')
         sys.exit(1)
-    args.func(args)
 
 
 if __name__ == '__main__':
