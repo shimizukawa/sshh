@@ -111,9 +111,12 @@ def cmd_agent(request):
         logger.info('ssh-agent PID=%s session "%s" has been started. To close this session, exit shell.',
                     sshenv['SSH_AGENT_PID'], request.group)
         shell_command = sshenv['SHELL']
-        if Path(bash_command).name.lower() == 'bash':
-            # set PS1 after bash execution if shell program is bash
-            shell_command = f'{shell_command} --rcfile <(echo ". $HOME/.bashrc; PS1={sshenv["PS1"]}"'
+        bashrc_location = Path(sshenv.get('HOME', ''), '.bashrc')
+        if Path(shell_command).name.lower() == 'bash' and bashrc_location.is_file():
+            # set PS1 after bash execution if shell program is bash and if bashrc is found
+            shell_command = [shell_command,
+                             '--rcfile',
+                             f'<(echo \'. {bashrc_location}; PS1="{sshenv["PS1"]}"\')']
         subprocess.run(shell_command, env=sshenv)
     finally:
         # kill agent
