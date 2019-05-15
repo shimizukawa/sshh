@@ -110,7 +110,8 @@ def cmd_agent(request):
         sshenv['PS1'] = f"[{request.group}]{sshenv['PS1']}"
         logger.info('ssh-agent PID=%s session "%s" has been started. To close this session, exit shell.',
                     sshenv['SSH_AGENT_PID'], request.group)
-        subprocess.run (sshenv['SHELL'], env=sshenv)
+        bash_command = f'{sshenv["SHELL"]} --init-file <(echo "export PS1={sshenv["PS1"]}"'
+        subprocess.run(bash_command, env=sshenv)
     finally:
         # kill agent
         subprocess.run(['ssh-agent', '-k'], env=sshenv, stdout=subprocess.DEVNULL)
