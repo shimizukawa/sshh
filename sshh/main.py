@@ -110,8 +110,11 @@ def cmd_agent(request):
         sshenv['PS1'] = f"[{request.group}]{sshenv['PS1']}"
         logger.info('ssh-agent PID=%s session "%s" has been started. To close this session, exit shell.',
                     sshenv['SSH_AGENT_PID'], request.group)
-        bash_command = f'{sshenv["SHELL"]} --rcfile <(echo ". $HOME/.bashrc; PS1={sshenv["PS1"]}"'
-        subprocess.run(bash_command, env=sshenv)
+        shell_command = sshenv['SHELL']
+        if Path(bash_command).name.lower() == 'bash':
+            # set PS1 after bash execution if shell program is bash
+            shell_command = f'{shell_command} --rcfile <(echo ". $HOME/.bashrc; PS1={sshenv["PS1"]}"'
+        subprocess.run(shell_command, env=sshenv)
     finally:
         # kill agent
         subprocess.run(['ssh-agent', '-k'], env=sshenv, stdout=subprocess.DEVNULL)
