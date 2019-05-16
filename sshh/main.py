@@ -123,10 +123,16 @@ def cmd_agent(request):
             shell_command = [shell_command,
                              '--rcfile',
                              rc_file.name]
+        else:
+            # For safely removing temp file
+            rc_file = None
         subprocess.run(shell_command, env=sshenv)
     finally:
         # kill agent
         subprocess.run(['ssh-agent', '-k'], env=sshenv, stdout=subprocess.DEVNULL)
+        # remove temp rc file
+        if rc_file:
+            os.unlink(rc_file.name)
         logger.info('ssh-agent PID=%s session "%s" was closed.',
                     sshenv['SSH_AGENT_PID'], request.group)
 
