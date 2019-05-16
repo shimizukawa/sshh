@@ -125,7 +125,7 @@ def cmd_agent(request):
                              '--rcfile',
                              temp_rc[1]]
         else:
-            # For saefly cleaning up temp files
+            # For safely cleaning up temp files
             temp_rc = None
         subprocess.run(shell_command, env=sshenv)
     finally:
