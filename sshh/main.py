@@ -5,6 +5,7 @@ import sys
 import subprocess
 import logging
 import argparse
+import tempfile
 from getpass import getpass
 from pathlib import Path
 
@@ -110,10 +111,28 @@ def cmd_agent(request):
         sshenv['PS1'] = f"[{request.group}]{sshenv['PS1']}"
         logger.info('ssh-agent PID=%s session "%s" has been started. To close this session, exit shell.',
                     sshenv['SSH_AGENT_PID'], request.group)
-        subprocess.run (sshenv['SHELL'], env=sshenv)
+        shell_command = sshenv['SHELL']
+        bashrc_location = Path(sshenv.get('HOME', ''), '.bashrc')
+        if Path(shell_command).name.lower() == 'bash' and bashrc_location.is_file():
+            # set PS1 after bash execution if shell program is bash and if bashrc is found
+            with tempfile.NamedTemporaryFile('w', delete=False) as rc_file:
+                # Write temp rc file that sets PS1 after loading bashrc
+                rc_file.writelines([f'. {bashrc_location}\n',
+                                    f'PS1="{sshenv["PS1"]}"'])
+            # Set command to override rcfile with tempfile
+            shell_command = [shell_command,
+                             '--rcfile',
+                             rc_file.name]
+        else:
+            # For safely removing temp file
+            rc_file = None
+        subprocess.run(shell_command, env=sshenv)
     finally:
         # kill agent
         subprocess.run(['ssh-agent', '-k'], env=sshenv, stdout=subprocess.DEVNULL)
+        # remove temp rc file
+        if rc_file:
+            os.unlink(rc_file.name)
         logger.info('ssh-agent PID=%s session "%s" was closed.',
                     sshenv['SSH_AGENT_PID'], request.group)
 

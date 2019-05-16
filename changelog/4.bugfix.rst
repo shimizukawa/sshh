@@ -1,0 +1,1 @@
+Init bash with temporary rc file to avoid overriding sshh env vars with bashrc (like PS1)
