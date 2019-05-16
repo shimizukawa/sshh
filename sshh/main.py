@@ -7,6 +7,7 @@ import logging
 import argparse
 from getpass import getpass
 from pathlib import Path
+from tempfile import mkstemp
 
 from sshh.regstry import Registry
 
@@ -114,13 +115,28 @@ def cmd_agent(request):
         bashrc_location = Path(sshenv.get('HOME', ''), '.bashrc')
         if Path(shell_command).name.lower() == 'bash' and bashrc_location.is_file():
             # set PS1 after bash execution if shell program is bash and if bashrc is found
+            temp_rc = mkstemp()
+            with open(temp_rc[1], 'w') as rc_file:
+                # Write temp rc file that sets PS1 after loading bashrc
+                rc_file.writelines([f'. {bashrc_location}\n',
+                                    f'PS1="{sshenv["PS1"]}"'])
+            # Set command to override rcfile with tempfile
             shell_command = [shell_command,
                              '--rcfile',
-                             f'<(echo \'. {bashrc_location}; PS1="{sshenv["PS1"]}"\')']
+                             temp_rc[1]]
+        else:
+            # For saefly cleaning up temp files
+            temp_rc = None
         subprocess.run(shell_command, env=sshenv)
     finally:
         # kill agent
         subprocess.run(['ssh-agent', '-k'], env=sshenv, stdout=subprocess.DEVNULL)
+        if temp_rc:
+            # Close temp files
+            # temp_rc[0] = file handler id
+            # temp_rc[1] = temp file path
+            os.close(temp_rc[0])
+            Path(temp_rc[1]).unlink()
         logger.info('ssh-agent PID=%s session "%s" was closed.',
                     sshenv['SSH_AGENT_PID'], request.group)
 
