@@ -6,62 +6,12 @@ import subprocess
 import logging
 import argparse
 import tempfile
-from getpass import getpass
 from pathlib import Path
 
+from sshh.logging import setup_logger
 from sshh.regstry import Registry
 
 logger = logging.getLogger(__name__)
-
-
-def test_passphrase(keyfile, phrase) -> bool:
-    """confirm passphrase for the keyfile.
-
-    :param keyfile: ssh key file path
-    :param phrase: passphrase for keyfile
-    :return: True if the keyfile/phrase pair is matched, otherwise False.
-    """
-    env = os.environ.copy()
-    env['SSH_ASKPASS'] = os.path.abspath(sys.argv[0])
-    env['DISPLAY'] = ':999'
-    env['PASSPHRASE'] = phrase
-    p = subprocess.Popen(
-        ['ssh-keygen', '-yf', str(keyfile)],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        env=env,
-        encoding='ascii',
-        preexec_fn=os.setsid
-    )
-    try:
-        r = p.communicate(timeout=1)
-        logger.debug('ssh-add return %s: %s', p.returncode, r)
-    except subprocess.TimeoutExpired:
-        logger.error('timeout')
-        p.kill()
-        logger.error(p.communicate())
-
-    return p.returncode == 0
-
-
-def cmd_add(request):
-    passphrase = getpass(prompt='Enter passphrase for the keyfile: ')
-    fpath = Path(request.keyfile.name).absolute()
-    if test_passphrase(fpath, passphrase):
-        request.registry.add_passphrase(request.group, fpath, passphrase)
-        request.registry.save()
-        logger.info('The keyfile is registered.')
-    else:
-        logger.error('passphrase for the keyfile is not correct.')
-
-
-def cmd_list(request):
-    for g, d in request.registry.items():
-        print(f'[{g}]')
-        for fn in d:
-            print(fn)
-        print()
 
 
 def cmd_agent(request):
@@ -86,6 +36,7 @@ def cmd_agent(request):
         logger.info('Empty group "%s", abort.', request.group)
         return
 
+    rc_file = None
     try:
         for keyfile, phrase in group_kp.items():
             tempenv['PASSPHRASE'] = phrase
@@ -108,7 +59,10 @@ def cmd_agent(request):
         logger.error(e)
     else:
         # invoke new shell for invoked ssh-agent
-        sshenv['PS1'] = f"[{request.group}]{sshenv['PS1']}"
+        if 'PS1' in sshenv:
+            sshenv['PS1'] = f"[{request.group}]{sshenv['PS1']}"
+        else:
+            sshenv['PS1'] = f"[{request.group}]"
         logger.info('ssh-agent PID=%s session "%s" has been started. To close this session, exit shell.',
                     sshenv['SSH_AGENT_PID'], request.group)
         shell_command = sshenv['SHELL']
@@ -137,60 +91,14 @@ def cmd_agent(request):
                     sshenv['SSH_AGENT_PID'], request.group)
 
 
-def cmd_init(request):
-    request.registry.init()
-
-
-def cmd_chpw(request):
-    reg = request.registry
-    password = getpass(prompt='Enter CURRENT password for your registry: ')
-    reg.load(password)
-    password1 = getpass(prompt='Enter NEW password for your registry: ')
-    password2 = getpass(prompt='Enter NEW password again for verification: ')
-    if password1 == password2:
-        reg.save(password1)
-        logging.info('Password has been changed.')
-    else:
-        logging.error("NEW passwords didn't match")
-
-
 def get_argparser():
     p = argparse.ArgumentParser()
     p.set_defaults(func=lambda a: p.print_help())
     p.add_argument('-d', '--debug', action='store_true', default=False, help='debug mode')
-    subs = p.add_subparsers(title='sub commands')
-
-    # init
-    p_init = subs.add_parser('init')
-    p_init.set_defaults(func=cmd_init)
-
-    # change password
-    p_chpw = subs.add_parser('chpw')
-    p_chpw.set_defaults(func=cmd_chpw)
-
-    # add key
-    p_add = subs.add_parser('add')
-    p_add.add_argument('-g', '--group', type=str, default='default', help='group name')
-    p_add.add_argument('keyfile', type=argparse.FileType('r'), help='ssh secret key file')
-    p_add.set_defaults(func=cmd_add)
-
-    # list keys
-    p_list = subs.add_parser('list')
-    p_list.set_defaults(func=cmd_list)
-
-    # invoke agent
-    p_agent = subs.add_parser('agent')
-    p_agent.add_argument('-g', '--group', type=str, default='default', help='group name')
-    p_agent.set_defaults(func=cmd_agent)
+    p.add_argument('-g', '--group', type=str, default='default', help='group name')
+    p.set_defaults(func=cmd_agent)
 
     return p
-
-
-def setup_logger(is_debug=False):
-    if is_debug:
-        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
-    else:
-        logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 def main():
