@@ -2,6 +2,22 @@
 sshh
 ====
 
+.. image:: https://img.shields.io/pypi/v/sshh.svg
+   :alt: PyPI
+   :target: http://pypi.org/p/sshh
+
+.. image:: https://img.shields.io/pypi/pyversions/sshh.svg
+   :alt: PyPI - Python Version
+
+.. image:: https://img.shields.io/github/license/shimizukawa/sshh.svg
+   :alt: License
+   :target: https://github.com/shimizukawa/sshh/blob/master/LICENSE
+
+.. image:: https://img.shields.io/github/stars/shimizukawa/sshh.svg?style=social&label=Stars
+   :alt: GitHub stars
+   :target: https://github.com/shimizukawa/sshh
+
+
 ``sshh`` is an ssh helper tool for batch registration of ssh private keys in ssh-agent.
 
 The main purpose of sshh is to avoid ``ssh: Too many authentication failures`` that occurs when
@@ -78,4 +94,15 @@ Invoke ssh-agent
     exit
     ssh-agent PID=67779 session "prod" has been closed.
     (venv) $
+
+
+License
+=======
+Licensed under the Apache Software Licence.
+
+
+CHANGES
+=======
+
+See: https://github.com/shimizukawa/sshh/blob/master/CHANGELOG.rst
 
