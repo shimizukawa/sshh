@@ -2,7 +2,18 @@
 sshh
 ====
 
-ssh command utility
+``sshh`` is an ssh helper tool for batch registration of ssh private keys in ssh-agent.
+
+The main purpose of sshh is to avoid ``ssh: Too many authentication failures`` that occurs when
+the number of keys registered in ssh-agent exceeds a certain number. This error occurs when the
+upper limit of key attempts is exceeded when the server is setting the upper limit of private key
+attempts strictly.
+
+This problem can be avoided by clearing all the keys registered in ssh-agent and registering
+as many as necessary, or entering the passphrase each time. However, in situations where there
+are multiple keys and servers, ssh connections can be very cumbersome. sshh uses Python's
+subprocess package to start a new ssh-agent, and further calls ssh-add to collectively register
+as many private keys as necessary. This relieves you from the hassle.
 
 Usages
 =======

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "sshh"
 version = "0.10.0"
-description = "ssh command utility"
+description = "sshh is an ssh helper tool for batch registration of ssh private keys in ssh-agent"
 authors = ["Takayuki Shimizukawa <shimizukawa@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.rst"
