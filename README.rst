@@ -12,7 +12,7 @@ Init
 
 ::
 
-    (.venv) $ sshh init
+    (.venv) $ sshh-config init
     Enter password for your registry: xxxxx
     The registry file ~/.sshh.registry is created.
 
@@ -21,7 +21,7 @@ Change password
 
 ::
 
-    (.venv) $ sshh chpw
+    (.venv) $ sshh-config chpw
     Enter CURRENT password for your registry: xxxxx
     Enter NEW password for your registry: yyyyy
     Enter NEW password again for verification: yyyyy
@@ -32,7 +32,7 @@ Register key
 
 ::
 
-    (.venv) $ sshh add -g prod ~/id_rsa_server1
+    (.venv) $ sshh-add -g prod ~/id_rsa_server1
     Enter password for your registry: xxxxx
     Enter passphrase for the keyfile: yyyyy
     The keyfile is registered.
@@ -42,7 +42,7 @@ List keys
 
 ::
 
-    (.venv) $ sshh list
+    (.venv) $ sshh-add -l
     Enter password for your registry: xxxxx
     [prod]
     /home/user/.ssh/id_rsa_server1
@@ -57,7 +57,7 @@ Invoke ssh-agent
 
 ::
 
-    (venv) $ sshh agent -g prod
+    (venv) $ sshh-agent -g prod
     Enter password for your registry: xxxxx
     Enter password for your registry:
     Registering keys for session "prod"
