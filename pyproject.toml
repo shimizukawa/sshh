@@ -38,6 +38,7 @@ sshh = "sshh.sshh:main"
 sshh-agent = "sshh.agent:main"
 sshh-add = "sshh.add:main"
 sshh-config = "sshh.config:main"
+sshh-askpass = "sshh.askpass:main"
 
 [tool.towncrier]
 package = "sshh"

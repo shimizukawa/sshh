@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 import sys
 import subprocess
@@ -10,6 +8,7 @@ from pathlib import Path
 
 from sshh.logging import setup_logger
 from sshh.regstry import Registry
+from sshh.askpass import get_executable_askpass
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ def test_passphrase(keyfile, phrase) -> bool:
     :return: True if the keyfile/phrase pair is matched, otherwise False.
     """
     env = os.environ.copy()
-    env['SSH_ASKPASS'] = os.path.abspath(sys.argv[0])
+    env['SSH_ASKPASS'] = get_executable_askpass()
     env['DISPLAY'] = ':999'
     env['PASSPHRASE'] = phrase
     p = subprocess.Popen(
@@ -76,11 +75,6 @@ def get_argparser():
 
 
 def main():
-    if os.environ.get('PASSPHRASE'):
-        # behave as ssh-askpass when ssh-add require passphrase
-        print(os.environ['PASSPHRASE'])
-        sys.exit(0)
-
     p = get_argparser()
     args = p.parse_args(sys.argv[1:])
     setup_logger(args.debug)

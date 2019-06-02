@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 import sys
 import subprocess
@@ -10,6 +8,7 @@ from pathlib import Path
 
 from sshh.logging import setup_logger
 from sshh.regstry import Registry
+from sshh.askpass import get_executable_askpass
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +24,7 @@ def cmd_agent(request):
         for k, v in [part.split('=') for part in agent_setting.split() if '=' in part]
     })
     tempenv = sshenv.copy()
-    tempenv['SSH_ASKPASS'] = os.path.abspath(sys.argv[0])
+    tempenv['SSH_ASKPASS'] = get_executable_askpass()
     tempenv['DISPLAY'] = ':999'
     logger.debug('env: %s', tempenv)
 
@@ -102,11 +101,6 @@ def get_argparser():
 
 
 def main():
-    if os.environ.get('PASSPHRASE'):
-        # behave as ssh-askpass when ssh-add require passphrase
-        print(os.environ['PASSPHRASE'])
-        sys.exit(0)
-
     p = get_argparser()
     args = p.parse_args(sys.argv[1:])
     setup_logger(args.debug)
