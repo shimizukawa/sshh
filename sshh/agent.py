@@ -1,14 +1,12 @@
 import os
-import sys
 import subprocess
 import logging
 import argparse
 import tempfile
 from pathlib import Path
 
-from sshh.logging import setup_logger
-from sshh.regstry import Registry
 from sshh.askpass import get_executable_askpass
+from sshh.runner import run
 
 logger = logging.getLogger(__name__)
 
@@ -92,24 +90,14 @@ def cmd_agent(request):
 
 def get_argparser():
     p = argparse.ArgumentParser()
-    p.set_defaults(func=lambda a: p.print_help())
     p.add_argument('-d', '--debug', action='store_true', default=False, help='debug mode')
     p.add_argument('-g', '--group', type=str, default='default', help='group name')
-    p.set_defaults(func=cmd_agent)
 
     return p
 
 
 def main():
-    p = get_argparser()
-    args = p.parse_args(sys.argv[1:])
-    setup_logger(args.debug)
-    args.registry = Registry()
-    try:
-        args.func(args)
-    except Registry.InvalidToken:
-        logger.error('Wrong password')
-        sys.exit(1)
+    run(cmd_agent, get_argparser())
 
 
 if __name__ == '__main__':

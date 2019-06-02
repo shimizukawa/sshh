@@ -6,9 +6,9 @@ import argparse
 from getpass import getpass
 from pathlib import Path
 
-from sshh.logging import setup_logger
 from sshh.regstry import Registry
 from sshh.askpass import get_executable_askpass
+from sshh.runner import run
 
 logger = logging.getLogger(__name__)
 
@@ -65,11 +65,11 @@ def cmd_list(request):
 
 def get_argparser():
     p = argparse.ArgumentParser()
-    p.set_defaults(func=lambda a: p.print_help())
     p.add_argument('-d', '--debug', action='store_true', default=False, help='debug mode')
     p.add_argument('-g', '--group', type=str, default='default', help='group name')
-    p.add_argument('-l', '--list', action='store_true', default=False, help='list keys')
-    p.add_argument('keyfile', nargs='?', type=argparse.FileType('r'), default=None, help='ssh secret key file')
+    eg = p.add_mutually_exclusive_group(required=True)
+    eg.add_argument('-l', '--list', action='store_true', default=False, help='list keys')
+    eg.add_argument('keyfile', nargs='?', type=argparse.FileType('r'), default=None, help='ssh secret key file')
 
     return p
 
@@ -77,17 +77,13 @@ def get_argparser():
 def main():
     p = get_argparser()
     args = p.parse_args(sys.argv[1:])
-    setup_logger(args.debug)
-    args.registry = Registry()
+
     if args.list:
         cmd = cmd_list
     else:
-        if not args.keyfile:
-            p.print_help()
-            return
         cmd = cmd_add
     try:
-        cmd(args)
+        run(cmd, p)
     except Registry.InvalidToken:
         logger.error('Wrong password')
         sys.exit(1)

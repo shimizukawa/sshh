@@ -1,10 +1,8 @@
-import sys
 import logging
 import argparse
 from getpass import getpass
 
-from sshh.logging import setup_logger
-from sshh.regstry import Registry
+from sshh.runner import run
 
 logger = logging.getLogger(__name__)
 
@@ -44,15 +42,7 @@ def get_argparser():
 
 
 def main():
-    p = get_argparser()
-    args = p.parse_args(sys.argv[1:])
-    setup_logger(args.debug)
-    args.registry = Registry()
-    try:
-        args.func(args)
-    except Registry.InvalidToken:
-        logger.error('Wrong password')
-        sys.exit(1)
+    run(lambda a:a.func(a), get_argparser())
 
 
 if __name__ == '__main__':
