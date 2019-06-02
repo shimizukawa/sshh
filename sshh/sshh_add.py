@@ -7,7 +7,7 @@ from getpass import getpass
 from pathlib import Path
 
 from sshh.regstry import Registry
-from sshh.askpass import get_executable_askpass
+from sshh.sshh_askpass import get_executable_askpass
 from sshh.runner import run
 
 logger = logging.getLogger(__name__)
