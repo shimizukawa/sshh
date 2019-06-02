@@ -1,14 +1,12 @@
-import os
 import sys
-import subprocess
 import logging
 import argparse
 from getpass import getpass
 from pathlib import Path
 
 from sshh.regstry import Registry
-from sshh.sshh_askpass import get_executable_askpass
 from sshh.runner import run
+from sshh.proc import call_with_phrase
 
 logger = logging.getLogger(__name__)
 
@@ -20,28 +18,7 @@ def test_passphrase(keyfile, phrase) -> bool:
     :param phrase: passphrase for keyfile
     :return: True if the keyfile/phrase pair is matched, otherwise False.
     """
-    env = os.environ.copy()
-    env['SSH_ASKPASS'] = get_executable_askpass()
-    env['DISPLAY'] = ':999'
-    env['PASSPHRASE'] = phrase
-    p = subprocess.Popen(
-        ['ssh-keygen', '-yf', str(keyfile)],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        env=env,
-        encoding='ascii',
-        preexec_fn=os.setsid
-    )
-    try:
-        r = p.communicate(timeout=1)
-        logger.debug('ssh-add return %s: %s', p.returncode, r)
-    except subprocess.TimeoutExpired:
-        logger.error('timeout')
-        p.kill()
-        logger.error(p.communicate())
-
-    return p.returncode == 0
+    return call_with_phrase(['ssh-keygen', '-yf', str(keyfile)], phrase)
 
 
 def cmd_add(request):

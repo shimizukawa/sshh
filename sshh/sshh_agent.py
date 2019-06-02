@@ -5,8 +5,8 @@ import argparse
 import tempfile
 from pathlib import Path
 
-from sshh.sshh_askpass import get_executable_askpass
 from sshh.runner import run
+from sshh.proc import call_with_phrase
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +21,7 @@ def cmd_agent(request):
         k: v.rstrip(';')
         for k, v in [part.split('=') for part in agent_setting.split() if '=' in part]
     })
-    tempenv = sshenv.copy()
-    tempenv['SSH_ASKPASS'] = get_executable_askpass()
-    tempenv['DISPLAY'] = ':999'
-    logger.debug('env: %s', tempenv)
+    logger.debug('env: %s', sshenv)
 
     logger.info('Registering keys for session "%s"', request.group)
     group_kp = request.registry.get_group_kp(request.group)
@@ -36,22 +33,8 @@ def cmd_agent(request):
     rc_file = None
     try:
         for keyfile, phrase in group_kp.items():
-            tempenv['PASSPHRASE'] = phrase
-            p = subprocess.Popen(
-                ['ssh-add', str(keyfile)],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                env=tempenv,
-                encoding='ascii',
-                preexec_fn=os.setsid
-            )
-            try:
-                r = p.communicate(timeout=1)
-                logger.debug('ssh-add return %s: %s', p.returncode, r)
-            except subprocess.TimeoutExpired:
-                p.kill()
-                raise RuntimeError('Something wrong ... \n%s', p.communicate())
+            if not call_with_phrase(['ssh-add', str(keyfile)], phrase, env=sshenv):
+                raise RuntimeError('Something wrong ... ')
     except RuntimeError as e:
         logger.error(e)
     else:
