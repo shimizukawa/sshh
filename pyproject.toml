@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sshh"
-version = "0.9.0"
+version = "0.10.0"
 description = "ssh command utility"
 authors = ["Takayuki Shimizukawa <shimizukawa@gmail.com>"]
 license = "Apache-2.0"
@@ -34,7 +34,11 @@ requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry.scripts]
-sshh = "sshh.main:main"
+sshh = "sshh.sshh:main"
+sshh-agent = "sshh.sshh_agent:main"
+sshh-add = "sshh.sshh_add:main"
+sshh-config = "sshh.sshh_config:main"
+sshh-askpass = "sshh.sshh_askpass:main"
 
 [tool.towncrier]
 package = "sshh"

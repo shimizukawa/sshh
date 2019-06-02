@@ -1,1 +1,0 @@
-REGISTRY_FILE = '~/.sshh.registry'
