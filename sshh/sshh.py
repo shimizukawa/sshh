@@ -1,6 +1,7 @@
 import logging
 import argparse
 
+from sshh import __version__
 from sshh.runner import run
 
 logger = logging.getLogger(__name__)
@@ -12,6 +13,7 @@ def cmd_sshh(request):
 
 def get_argparser():
     p = argparse.ArgumentParser()
+    p.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
     p.add_argument('-d', '--debug', action='store_true', default=False, help='debug mode')
 
     return p

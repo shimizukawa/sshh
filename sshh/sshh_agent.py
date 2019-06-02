@@ -5,6 +5,7 @@ import argparse
 import tempfile
 from pathlib import Path
 
+from sshh import __version__
 from sshh.runner import run
 from sshh.proc import call_with_phrase
 
@@ -73,6 +74,7 @@ def cmd_agent(request):
 
 def get_argparser():
     p = argparse.ArgumentParser()
+    p.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
     p.add_argument('-d', '--debug', action='store_true', default=False, help='debug mode')
     p.add_argument('-g', '--group', type=str, default='default', help='group name')
 

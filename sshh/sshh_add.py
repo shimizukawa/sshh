@@ -4,6 +4,7 @@ import argparse
 from getpass import getpass
 from pathlib import Path
 
+from sshh import __version__
 from sshh.regstry import Registry
 from sshh.runner import run
 from sshh.proc import call_with_phrase
@@ -42,6 +43,7 @@ def cmd_list(request):
 
 def get_argparser():
     p = argparse.ArgumentParser()
+    p.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
     p.add_argument('-d', '--debug', action='store_true', default=False, help='debug mode')
     p.add_argument('-g', '--group', type=str, default='default', help='group name')
     eg = p.add_mutually_exclusive_group(required=True)
